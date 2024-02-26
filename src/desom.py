@@ -81,14 +81,16 @@ class DESOM:
         map_size: tuple representing the size of the rectangular map. Number of prototypes is map_size[0]*map_size[1]
     """
 
+    ae_funcs = {'cnn': cnn_autoencoder, 'fc': mlp_autoencoder, 'cnn2D': cnn_2dae, 'cnn1D': cnn_1dae}
+
     def __init__(self, encoder_dims, ae_type, map_size, latent_dim=32):
         self.encoder_dims = encoder_dims
-        self.input_dim = self.encoder_dims[0]
         self.ae_type = ae_type
         self.map_size = map_size
-        self.n_prototypes = map_size[0]*map_size[1]
+        self.n_prototypes = map_size[0] * map_size[1]
         self.pretrained = False
         self.latent_dim = latent_dim
+
     
     def initialize(self, ae_act='relu', ae_init='glorot_uniform'):
         """
@@ -99,18 +101,9 @@ class DESOM:
             ae_init: initialization of AE layers
         """
         # Create AE models
-        if self.ae_type == 'cnn':
-            self.autoencoder, self.encoder, self.decoder = cnn_autoencoder(self.encoder_dims, ae_act, ae_init)
-        elif self.ae_type == 'fc':
-            self.autoencoder, self.encoder, self.decoder = mlp_autoencoder(self.encoder_dims, ae_act, ae_init) 
-            
-        # CUSTOM 2D-ConvAE
-        elif self.ae_type == 'cnn2D':
-            self.autoencoder, self.encoder, self.decoder = cnn_2dae(self.input_dim, latent_dim=self.latent_dim)
-            
-        # Add custom AE
-        elif self.ae_type == 'cnn1D':
-            self.autoencoder, self.encoder, self.decoder = cnn_1dae(self.input_dim)
+        kwargs = {'act': ae_act, 'init': ae_init, 'latent_dim': self.latent_dim}
+        self.autoencoder, self.encoder, self.decoder = self.ae_funcs[self.ae_type](self.encoder_dims,
+                                                                                   **kwargs)
 
         som_layer = SOMLayer(self.map_size, name='SOM')(self.encoder.output)
         logging.debug(f"SOM Layer: {type(som_layer)} -> {som_layer}")
@@ -304,8 +297,11 @@ class DESOM:
         logging.info(f"Pretrained weights are saved to {weights_filename}")
         self.pretrained = True
 
-    def fit(self, X_train, y_train=None,
-            X_val=None, y_val=None,
+    def fit(self,
+            x_train,
+            y_train=None,
+            X_val=None,
+            y_val=None,
             iterations=10000,
             som_iterations=10000,
             eval_interval=100,
@@ -333,11 +329,12 @@ class DESOM:
            decay: type of temperature decay ('exponential' or 'linear')
            save_dir: path to existing directory where weights and logs are saved
         """
-        if not self.pretrained:
-            print('Autoencoder was not pre-trained!')
 
-        save_interval = X_train.shape[0] // batch_size * save_epochs # save every save_epochs epochs
-        print('Save interval:', save_interval)
+        if not self.pretrained:
+            logging.info('Autoencoder was not pre-trained!')
+
+        save_interval = x_train.shape[0] // batch_size * save_epochs # save every save_epochs epochs
+        logging.info('Save interval:', save_interval)
 
         # Logging file
         logfile = open(save_dir + '/desom_log.csv', 'w')
@@ -358,13 +355,13 @@ class DESOM:
 
         for ite in range(iterations):
             # Get training and validation batches
-            if (index + 1) * batch_size > X_train.shape[0]:
-                X_batch = X_train[index * batch_size::]
+            if (index + 1) * batch_size > x_train.shape[0]:
+                X_batch = x_train[index * batch_size::]
                 if y_train is not None:
                     y_batch = y_train[index * batch_size::]
                 index = 0
             else:
-                X_batch = X_train[index * batch_size:(index + 1) * batch_size]
+                X_batch = x_train[index * batch_size:(index + 1) * batch_size]
                 if y_train is not None:
                     y_batch = y_train[index * batch_size:(index + 1) * batch_size]
                 index += 1
@@ -471,8 +468,7 @@ class DESOM:
 """
 Main
 """
-if __name__ == "__main__":
-
+def main():
     # Parsing arguments and setting hyper-parameters
     parser = argparse.ArgumentParser(description='train', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     #DATASET
@@ -593,3 +589,5 @@ if __name__ == "__main__":
         plt.savefig('desom_map_{}.png'.format(args.dataset), bbox_inches='tight')
         
         
+if __name__ == "__main__":
+    main()

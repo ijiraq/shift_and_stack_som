@@ -5,7 +5,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 #-------------------------------------------Imports
 
 #Import a class
-from src.DESOM.DESOM import DESOM
+from src.desom.DESOM import DESOM
 #from src.DESOM.SOM import SOMLayer
 
 # #Load model

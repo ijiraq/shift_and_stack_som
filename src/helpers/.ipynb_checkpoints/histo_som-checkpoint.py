@@ -13,7 +13,7 @@ from random import sample
 from timeit import default_timer as timer
 
 from minisom import MiniSom
-from src.DESOM.DESOM import DESOM  #Constructor
+from src.desom.DESOM import DESOM  #Constructor
 
 
 from src.helpers import preprocessor as prep

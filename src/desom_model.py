@@ -3,7 +3,7 @@
 
 import numpy as np
 #Import a class
-from DESOM import DESOM
+from desom import DESOM
 # #Load model
 from keras.models import load_model
 from keras.models import Model

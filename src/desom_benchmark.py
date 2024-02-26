@@ -13,7 +13,7 @@ from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from datasets import load_data
 
 from sklearn.cluster import KMeans
-from DESOM import DESOM
+from desom import DESOM
 
 datasets = ['MNIST (K=64)', 'Fashion-MNIST (K=64)', 'USPS (K=64)', 'REUTERS-10k (K=64)',
             'MNIST (K=10)', 'Fashion-MNIST (K=10)', 'USPS (K=10)', 'REUTERS-10k (K=4)']

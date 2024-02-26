@@ -5,9 +5,10 @@ import logging
 
 
 im_dim= 21
-def cnn_2dae(im_dim, latent_dim=64):
+def cnn_2dae(encoder_dims, latent_dim=64):
 
-    #input_layer = Input(shape=(im_dim,im_dim,1), name = 'input') 
+    #input_layer = Input(shape=(im_dim,im_dim,1), name = 'input')
+    im_dim = encoder_dims[0]
     input_layer = Input((im_dim*im_dim*1,), name = 'input')
     x = Reshape((im_dim,im_dim,1))(input_layer)
    

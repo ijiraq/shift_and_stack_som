@@ -6,13 +6,13 @@ import argparse
 import logging
 
 import numpy as np
-from DESOM import DESOM
+from desom import DESOM
 import matplotlib.pyplot as plt
 from datasets import load_spectra_data, load_mnist, load_im
 import inspect
 
 
-def main():
+def run():
     """
     Based on the CL Args train a SoM based on some input data set.
     """
@@ -56,12 +56,12 @@ def main():
     x_train, y_train, encoder_dims = globals()[load_function](args.data_filename)
 
     kwargs = {}
-    for parameter in inspect.signature(train_som).parameters:
+    for parameter in inspect.signature(get_som).parameters:
         if hasattr(args, parameter):
             kwargs[parameter] = getattr(args, parameter)
 
     logging.debug(f"Training SOM with parameters set to: {kwargs}")
-    train_som(x_train, y_train, encoder_dims, **kwargs)
+    get_som(x_train, y_train, encoder_dims, **kwargs)
 
 
 def load_spectral_data(spectral_filename, norm=False):
@@ -132,12 +132,12 @@ def plot_image_som(som, fig_filename='image_som.png'):
     plt.savefig(fig_filename)
 
 
-def train_som(x_train, y_train, encoder_dims, ae_type, map_size, gamma,
-              latent_dim, ae_epochs, ae_batch_size, iterations,
-              som_iterations, save_epochs, model_batch_size, Tmax, Tmin,
-              optimizer='adam', ae_act='relu', ae_init='glorot_uniform',
-              decay='exponential',
-              save_dir='results'):
+def get_som(x_train, y_train, encoder_dims, ae_type, map_size, gamma,
+            latent_dim, ae_epochs, ae_batch_size, iterations,
+            som_iterations, save_epochs, model_batch_size, Tmax, Tmin,
+            optimizer='adam', ae_act='relu', ae_init='glorot_uniform',
+            decay='exponential',
+            save_dir='results'):
 
     som = DESOM(encoder_dims=encoder_dims,
                 ae_type=ae_type,
@@ -174,7 +174,7 @@ def train_som(x_train, y_train, encoder_dims, ae_type, map_size, gamma,
 
 
 if __name__ == '__main__':
-    main()
+    run()
 
 
 

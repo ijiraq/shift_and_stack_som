@@ -3,7 +3,7 @@ from keras.models import Model
 from keras import backend as K
 
 
-def cnn_1dae(input_dims,latent_dims= 256):
+def cnn_1dae(encoder_dims,latent_dims= 256):
     
     # input_layer = Input(shape=(input_dims,), name='input')  
     # encoded=input_layer
@@ -19,6 +19,7 @@ def cnn_1dae(input_dims,latent_dims= 256):
     #------------------- Encoder--------------
     
     #Input layer
+    imput_dims = encoder_dims[0]
     input_layer = Input(shape=(input_dims,), name='input')
     #Reshape to 3D before Convolution
     reshaped_layer = Reshape((input_dims, 1))(input_layer)
